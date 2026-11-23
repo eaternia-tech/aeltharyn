@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pengetik Aeltharyn</title>
+
+<style>
+body {
+  background: #100d1b;
+  color: #eee9ff;
+  font-family: Georgia, serif;
+  padding: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+h1 {
+  color: #e7cf9b;
+  text-align: center;
+  letter-spacing: 5px;
+}
+
+p {
+  color: #b9afd6;
+  text-align: center;
+}
+
+.box {
+  background: #211b35;
+  border: 1px solid #74618e;
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  box-sizing: border-box;
+  background: #151123;
+  color: white;
+  border: 1px solid #77658e;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+}
+
+#hasil {
+  min-height: 80px;
+  background: #151123;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 30px;
+  overflow-wrap: anywhere;
+}
+
+button {
+  background: #c7a7ff;
+  color: #21152e;
+  border: 0;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>AELTHARYN</h1>
+<p>Bahasa kuno dari dunia Amoria</p>
+
+<div class="box">
+  <h3>Masukkan tulisanmu</h3>
+  <textarea id="teks"
+  placeholder="Tuliskan sesuatu..."></textarea>
+</div>
+
+<div class="box">
+  <h3>Aksara Elarith</h3>
+  <div id="hasil">✧</div>
+  <button onclick="salin()">Salin hasil</button>
+  <button onclick="hapus()">Hapus</button>
+</div>
+
+<script>
+const kamus = {
+  ae:"𐌀", ei:"ϟ", th:"Ϯ",
+  rh:"Я", sh:"Ϣ", va:"⋁",
+  el:"ℒ", ly:"ჳ", na:"Ո",
+  sa:"Ϟ", ka:"Ҡ", ar:"Ⱥ",
+  en:"Є", or:"⊙",
+  a:"◇", e:"⟡", i:"ı",
+  o:"◉", u:"∪"
+};
+
+const urutan = Object.keys(kamus)
+.sort((a,b) => b.length-a.length);
+
+function ubah(teks) {
+  let hasil = "";
+  let i = 0;
+
+  while(i < teks.length) {
+    let cocok = false;
+
+    if (/\s/.test(teks[i])) {
+      hasil += teks[i++];
+      continue;
+    }
+
+    for(const huruf of urutan) {
+      if(teks.slice(i,i+huruf.length)
+      .toLowerCase() === huruf) {
+        hasil += kamus[huruf];
+        i += huruf.length;
+        cocok = true;
+        break;
+      }
+    }
+
+    if(!cocok) {
+      hasil += teks[i].toUpperCase();
+      i++;
+    }
+  }
+
+  return hasil;
+}
+
+document.getElementById("teks")
+.addEventListener("input", function() {
+  document.getElementById("hasil")
+  .textContent = ubah(this.value) || "✧";
+});
+
+function salin() {
+  const hasil = document.getElementById("hasil");
+  navigator.clipboard.writeText(hasil.textContent)
+  .then(() => alert("Berhasil disalin!"))
+  .catch(() => alert("Silakan salin hasil secara manual."));
+}
+
+function hapus() {
+  document.getElementById("teks").value = "";
+  document.getElementById("hasil").textContent = "✧";
+}
+</script>
+
+</body>
+</html>
