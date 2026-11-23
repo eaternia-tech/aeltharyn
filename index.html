@@ -8,7 +8,7 @@
 <style>
 @font-face {
   font-family: "Elarith";
-  src: url("./Elarith_Prototype_LV.ttf?v=2") format("truetype");
+  src: url("./Elarith_Lengkap.ttf?v=2") format("truetype");
   font-display: swap;
 }
 
@@ -46,7 +46,7 @@ p {
 
 textarea {
   width: 100%;
-  height: 120px;
+  min-height: 120px;
   background: #151123;
   color: white;
   border: 1px solid #77658e;
@@ -57,14 +57,15 @@ textarea {
 }
 
 #hasil {
-  min-height: 100px;
+  min-height: 110px;
   background: #151123;
   padding: 15px;
   border-radius: 10px;
   font-family: "Elarith", serif;
-  font-size: 32px;
-  line-height: 1.7;
+  font-size: 34px;
+  line-height: 1.8;
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 button {
@@ -104,8 +105,13 @@ button:hover {
   <h3>Aksara Elarith</h3>
   <div id="hasil">✧</div>
 
-  <button onclick="salin()">Salin hasil</button>
-  <button onclick="hapus()">Hapus</button>
+  <button type="button" onclick="salin()">
+    Salin hasil
+  </button>
+
+  <button type="button" onclick="hapus()">
+    Hapus
+  </button>
 
   <p class="catatan">
     Hasil konversi aksara akan muncul di sini.
@@ -113,7 +119,12 @@ button:hover {
 </div>
 
 <script>
+
+// KAMUS AKSARA ELARITH
+
 const kamus = {
+
+  // GABUNGAN HURUF
   ae: "\uE005",
   ei: "\uE006",
   th: "\uE007",
@@ -128,23 +139,79 @@ const kamus = {
   ar: "\uE010",
   en: "\uE011",
   or: "\uE012",
+
+  // ALFABET A-Z
   a: "\uE000",
+  b: "\uE015",
+  c: "\uE016",
+  d: "\uE017",
   e: "\uE001",
+  f: "\uE018",
+  g: "\uE019",
+  h: "\uE01A",
   i: "\uE002",
+  j: "\uE01B",
+  k: "\uE01C",
+  l: "\uE013",
+  m: "\uE01D",
+  n: "\uE01E",
   o: "\uE003",
-  u: "\uE004", 
-  l: "\uE013", 
+  p: "\uE01F",
+  q: "\uE020",
+  r: "\uE021",
+  s: "\uE022",
+  t: "\uE023",
+  u: "\uE004",
   v: "\uE014",
+  w: "\uE024",
+  x: "\uE025",
+  y: "\uE026",
+  z: "\uE027",
+
+  // ANGKA 0-9
+  "0": "\uE028",
+  "1": "\uE029",
+  "2": "\uE02A",
+  "3": "\uE02B",
+  "4": "\uE02C",
+  "5": "\uE02D",
+  "6": "\uE02E",
+  "7": "\uE02F",
+  "8": "\uE030",
+  "9": "\uE031",
+
+  // TANDA BACA
+  ".": "\uE032",
+  ",": "\uE033",
+  ";": "\uE034",
+  ":": "\uE035",
+  "!": "\uE036",
+  "?": "\uE037",
+  "-": "\uE038",
+  "(": "\uE039",
+  ")": "\uE03A",
+  "'": "\uE03B",
+  '"': "\uE03C"
 };
+
+
+// URUTAN KONVERSI
+// Gabungan huruf diprioritaskan.
 
 const urutan = Object.keys(kamus)
   .sort((a, b) => b.length - a.length);
 
+
+// FUNGSI KONVERSI
+
 function ubah(teks) {
+
   let hasil = "";
   let i = 0;
 
   while (i < teks.length) {
+
+    // Mempertahankan spasi
     if (/\s/.test(teks[i])) {
       hasil += teks[i];
       i++;
@@ -153,10 +220,16 @@ function ubah(teks) {
 
     let cocok = false;
 
-    for (const huruf of urutan) {
-      if (teks.slice(i, i + huruf.length).toLowerCase() === huruf) {
-        hasil += kamus[huruf];
-        i += huruf.length;
+    for (const token of urutan) {
+
+      const potongan = teks
+        .slice(i, i + token.length)
+        .toLowerCase();
+
+      if (potongan === token) {
+
+        hasil += kamus[token];
+        i += token.length;
         cocok = true;
         break;
       }
@@ -171,30 +244,56 @@ function ubah(teks) {
   return hasil;
 }
 
+
+// MENGHUBUNGKAN KOLOM INPUT DAN OUTPUT
+
 const kolomTeks = document.getElementById("teks");
 const kolomHasil = document.getElementById("hasil");
 
 kolomTeks.addEventListener("input", function() {
-  kolomHasil.textContent = ubah(this.value) || "✧";
+
+  kolomHasil.textContent =
+    ubah(this.value) || "✧";
+
 });
 
-function salin() {
+
+// TOMBOL SALIN
+
+async function salin() {
+
   const teksHasil = kolomHasil.textContent;
 
-  if (teksHasil === "✧") {
+  if (!teksHasil || teksHasil === "✧") {
     alert("Belum ada tulisan untuk disalin.");
     return;
   }
 
-  navigator.clipboard.writeText(teksHasil)
-    .then(() => alert("Berhasil disalin!"))
-    .catch(() => alert("Silakan salin hasil secara manual."));
+  try {
+
+    await navigator.clipboard.writeText(teksHasil);
+    alert("Berhasil disalin!");
+
+  } catch (error) {
+
+    alert(
+      "Browser tidak mengizinkan salin otomatis. Silakan salin secara manual."
+    );
+
+  }
 }
 
+
+// TOMBOL HAPUS
+
 function hapus() {
+
   kolomTeks.value = "";
   kolomHasil.textContent = "✧";
+  kolomTeks.focus();
+
 }
+
 </script>
 
 </body>
